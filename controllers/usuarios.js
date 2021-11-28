@@ -23,11 +23,8 @@ const usuariosPost = async (req, res) => {
   usuario.password = encriptar(password);
   // Guardar en DB
   await usuario.save();
-  res.json({
-    usuario
-  });
+  res.json(usuario);
 };
-
 const usuariosPut = async (req, res) => {
   const { id } = req.params;
   const { _id, password, google, correo, ...resto } = req.body;
@@ -41,10 +38,9 @@ const usuariosPut = async (req, res) => {
 
 const usuariosDelete = async (req, res) => {
   const { id } = req.params;
-  // Borrado físico
-  // const usuario = await Usuario.findByIdAndDelete(id);
-  const usuario = await Usuario.findByIdAndUpdate(id, { estado: false });
-  res.json(usuario);
+  const usuarioEliminado = await Usuario.findByIdAndUpdate(id, { estado: false });
+  const usuarioAutenticado = req.usuario;
+  res.json({ usuarioEliminado, usuarioAutenticado });
 };
 
 module.exports = {
