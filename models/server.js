@@ -1,14 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
+const { createServer } = require('http');
 
 const { dbConnection } = require('../database/config');
+const { socketController } = require('../sockets/controller');
 require('dotenv').config();
 
 class Server {
   constructor () {
     this.app = express();
     this.port = process.env.PORT;
+    this.server = createServer(this.app);
+    this.io = require('socket.io')(this.server);
     this.paths = {
       auth: '/api/auth',
       buscar: '/api/buscar',
@@ -23,6 +27,8 @@ class Server {
     this.middlewares();
     // Ruutas de mi app
     this.routes();
+    // Sockets
+    this.sockets();
   }
 
   async conectarDB () {
@@ -54,9 +60,13 @@ class Server {
     this.app.use(this.paths.uploads, require('../routes/uploads'));
   }
 
+  sockets () {
+    this.io.on('connection', (socket) => socketController(socket, this.io));
+  }
+
   listen () {
-    this.app.listen(this.port, () => {
-      console.log('RestServer funcionando en el puerto ', this.port);
+    this.server.listen(this.port, () => {
+      console.log('SocketChat funcionando en el puerto ', this.port);
     });
   }
 }

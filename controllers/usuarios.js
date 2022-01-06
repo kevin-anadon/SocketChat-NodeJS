@@ -1,4 +1,4 @@
-const { encriptar } = require('../helpers/encrypt');
+const { encriptar } = require('../helpers');
 const Usuario = require('../models/usuario');
 
 const usuariosGet = async (req, res) => {
